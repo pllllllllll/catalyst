@@ -29,13 +29,15 @@ $row = 1;
 if (($handle = fopen($values['file'], "r")) !== FALSE) {
   while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
     $num = count($data);
-    echo "\n $num fields in line $row: \n";
+    //echo "\n $num fields in line $row: \n";
     $row++;
+    $ValidEmail='yes';
+   	$ValidNumberOfFields='yes';
 
     //validate number of fields is 3
     if ($num<>3) {
     	//format incorrect for line
-    	echo "\nNumber of fields ($num) not 3 for line $row";
+    	echo "\n Number of fields ($num) not 3 for line $row , skipping this line for processing. ".$data[0];
     }else{
 	    for ($c=0; $c < $num; $c++) {
 	    	//echo "c=$c num=$num /n";
@@ -51,12 +53,12 @@ if (($handle = fopen($values['file'], "r")) !== FALSE) {
 				if (preg_match("/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix", $data[$c])) {
 				  //echo 'This is a valid email. '.$data[$c];
 				} else {
-				  echo 'Invalid email.'.$data[$c];
+				  echo 'Invalid email. Not processing this record '.$data[$c];
+				  $EmailValid='no';
 				}
-
 	        }    
-	        //email format
-	        echo $data[$c] . "\n";
+	        //field of data
+	        //echo $data[$c] . "\n";
 	    }
 	}
   }
