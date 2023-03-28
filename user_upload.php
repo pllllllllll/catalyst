@@ -1,24 +1,51 @@
 <?php
-//C:\xampp\php\php.exe C:\xampp\htdocs\catalyst\catalyst\hello.php  --file=C:\xampp\htdocs\catalyst\catalyst\users.csv
+//C:\xampp\php\php.exe C:\xampp\htdocs\catalyst\catalyst\user_upload.php  --file=C:\xampp\htdocs\catalyst\catalyst\users.csv
 
 //https://www.geeksforgeeks.org/how-to-read-user-or-console-input-in-php/
 //command line prompt user for table name
-$a = readline('Is this a dry run (y/n) : ');
-if ($a=='n'){ //proceed as normal
-	$b = readline('Enter a table name: ');
-	$c = readline('Enter a mysql username: ');
-	$d = readline('Enter a mysql password: ');
-}elseif($a=='y'){//no db insert
-	$b = readline('Enter a table name: ');
+
+$Dry_Run = $MySQL_Username = $MySQL_Password = $Create_Table = $Table_Name = '';
+
+$Create_Table = readline('Create table in database only (y/n) : ');
+if ($Create_Table=='y'){ //create table only, no insert or file reading
+	$Table_Name = readline('Enter a table name: ');
+}elseif($Create_Table=='n'){//proceed to next question
+	$Dry_Run = readline('Is this a dry run (y/n) : '); //create table and read file data
+	if ($Dry_Run=='n'){ //proceed as normal
+		$Table_Name = readline('Enter a table name: ');
+		$MySQL_Username = readline('Enter a mysql username: ');
+		$MySQL_Password = readline('Enter a mysql password: ');
+	}elseif($Dry_Run=='y'){//no db insert, create table and read data
+		$Table_Name = readline('Enter a table name: ');
+	}else{
+		echo "Answer must be 'y' or 'n' , please try again.\n";	
+		exit();
+	}
 }else{
 	echo "Answer must be 'y' or 'n' , please try again.\n";	
 	exit();
 }
 
 
-echo "this is the table name  $a\n";
-echo "this is the username  $b\n";
-echo "this is the password  $c\n";
+
+if ($Create_Table=='y'){ //create table only
+	//$Table_Name
+}elseif($Dry_Run=='n'){ //create table, read data, insert data
+		//$Table_Name,$MySQL_Username,$MySQL_Password
+	$options = ['file:'];
+	ftnReadInsertData($options);
+}elseif($Dry_Run=='y'){ //create table, read data, NO insert data
+
+}
+
+
+
+
+
+
+//echo "this is the table name  $a\n";
+//echo "this is the username  $b\n";
+//echo "this is the password  $c\n";
 
 $options = ['file:'];
 $values = getopt(null, $options);
