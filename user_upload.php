@@ -7,11 +7,17 @@
 $Dry_Run = $MySQL_Username = $MySQL_Password = $Create_Table = $Table_Name = '';
 
 $Create_Table = readline('Create table in database only (y/n) : ');
+
 if ($Create_Table=='y'){ //create table only, no insert or file reading
 	$Table_Name = readline('Enter a table name: ');
+	$MySQL_Username = readline('Enter a mysql username: ');
+	$MySQL_Password = readline('Enter a mysql password: ');
+	ftnCreateTable($ftnTableName,$ftnUsername,$ftnPassword){
 }elseif($Create_Table=='n'){//proceed to next question
+
 	$Dry_Run = readline('Is this a dry run (y/n) : '); //create table and read file data
-	if ($Dry_Run=='n'){ //proceed as normal
+	
+	if ($Dry_Run=='n'){ //proceed with create/read/insert
 		$Table_Name = readline('Enter a table name: ');
 		$MySQL_Username = readline('Enter a mysql username: ');
 		$MySQL_Password = readline('Enter a mysql password: ');
@@ -37,6 +43,11 @@ if (ISSET($ftnTableName)){//create table
 }else{
 	exit(); 
 }
+
+/////////////////////////////////
+function ftnCreateTable($ftnTableName,$ftnUsername,$ftnPassword){
+
+}//function ftnCreateTable
 
 //dry run, create table and read data, no insertion
 //ftnReadData($UsersFile);
