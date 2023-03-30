@@ -19,7 +19,9 @@ if ($Create_Table=='y'){ //create table only, no insert or file reading
 	$MySQL_Password = readline('Enter a mysql password: ');
 	ftnCreateTable($Table_Name,$MySQL_Username,$MySQL_Password,$MySQL_Host,$MySQL_DB);
 }elseif($Create_Table=='n'){//proceed to next question
-	$Dry_Run = readline('Is this a dry run (y/n) : '); //create table and read file data
+
+	$Dry_Run = readline('Is this a dry run (y/n) : '); 
+
 	$Table_Name = readline('Enter a table name: ');
 	$MySQL_Host = readline('Enter a mysql host: ');
 	$MySQL_DB = readline('Enter database to use: ');
@@ -27,14 +29,15 @@ if ($Create_Table=='y'){ //create table only, no insert or file reading
 	$MySQL_Password = readline('Enter a mysql password: ');	
 	ftnCreateTable($Table_Name,$MySQL_Username,$MySQL_Password,$MySQL_Host,$MySQL_DB);
 	ftnReadFile($UsersFile);
-	if ($Dry_Run=='n'){ //proceed with create/read/insert
 
-	}elseif($Dry_Run=='y'){//no db insert, create table and read data
-		$Table_Name = readline('Enter a table name: ');
-	}else{
-		echo "Answer must be 'y' or 'n' , please try again.\n";	
-		exit();
-	}
+	//if ($Dry_Run=='n'){ //proceed with create/read/insert
+
+	//}elseif($Dry_Run=='y'){//no db insert, create table and read data
+		//$Table_Name = readline('Enter a table name: ');
+	//}else{
+		//echo "Answer must be 'y' or 'n' , please try again.\n";	
+		//exit();
+	//}
 }else{
 	echo "Answer must be 'y' or 'n' , please try again.\n";	
 	exit();
@@ -61,7 +64,7 @@ if (!$connection) {
 $query="DROP TABLE IF EXISTS $ftnDB.$ftnTable";
 mysqli_query($connection,$query) or die(mysqli_error()); 
 
-$query = "CREATE TABLE  users (name varchar(100) NOT NULL,surname varchar(100) NOT NULL,email varchar(100) NOT NULL, UNIQUE KEY email(email))"; 
+$query = "CREATE TABLE  $ftnTable (name varchar(100) NOT NULL,surname varchar(100) NOT NULL,email varchar(100) NOT NULL, UNIQUE KEY email(email))"; 
 
 if (mysqli_query($connection, $query)) { 
   echo "Table successfully created\n"; 
@@ -75,9 +78,9 @@ mysqli_close($connection);
 }//function ftnCreateTable
 
 //dry run, read data
-ftnReadFile($strUsersFile){
+function ftnReadFile($strUsersFile){
 $row = 1;
-	if (($handle = fopen($ftnUsersFile, "r")) !== FALSE) {
+	if (($handle = fopen($strUsersFile, "r")) !== FALSE) {
 		fgetcsv($handle, 10000, ","); //reads first line header, so its skipped in the while loop
 	  while (($data = fgetcsv($handle, 200, ",")) !== FALSE) {
 	    $num = count($data);
@@ -105,13 +108,17 @@ $row = 1;
 					if (preg_match("/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix", $data[$c])) {
 					  //echo 'This is a valid email. '.$data[$c];
 					} else {
-					  echo "\n Invalid email. Not processing this record ".$data[$c];
-					  $EmailValid='no';
+					  //echo "Invalid email. Not processing this record ".$data[$c]."\n";
+					  $ValidEmail='no';
 					}
 		        }    
 		        //field of data
-		        //echo $data[$c] . "\n";
 		    }
+		    if ($ValidEmail=='yes'){
+		    	echo "Successful read: ". $data[0] ." ". $data[1] ." ". $data[2] . "\n";
+			}else{
+				echo "Invalid Email: ". $data[0] ." ". $data[1] ." ". $data[2] . "\n";
+			}
 		}
 	  }
 	  fclose($handle);
