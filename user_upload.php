@@ -22,15 +22,15 @@ foreach ( $argv as $arg )
 
     if ( preg_match( '/^--help$/', $arg, $matches ) ) {
         $arg_help = "y";
-    }else if ( preg_match( '/^-h=(.*)$/', $arg, $matches ) ) {
+    }else if ( preg_match( '/^-h (.*)$/', $arg, $matches ) ) {
         $arg_host = $matches[1];
-    }else if ( preg_match( '/^-p=(.*)$/', $arg, $matches ) ) {
+    }else if ( preg_match( '/^-p (.*)$/', $arg, $matches ) ) {
         $arg_password = $matches[1];
-    }else if ( preg_match( '/^-u=(.*)$/', $arg, $matches ) ) {
+    }else if ( preg_match( '/^-u (.*)$/', $arg, $matches ) ) {
         $arg_username = $matches[1];
-    }else if ( preg_match( '/^-db=(.*)$/', $arg, $matches ) ) {
+    }else if ( preg_match( '/^-db (.*)$/', $arg, $matches ) ) {
         $arg_db = $matches[1];
-    }else if ( preg_match( '/^--file=(.*)$/', $arg, $matches ) ) {
+    }else if ( preg_match( '/^--file (.*)$/', $arg, $matches ) ) {
         $arg_file = $matches[1];
     }else if ( preg_match( '/^--dry_run$/', $arg, $matches ) ) {
         $arg_dry_run = "n";
