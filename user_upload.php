@@ -21,7 +21,7 @@ foreach ( $argv as $arg )
     unset( $matches );
 
     if ( preg_match( '/^--help$/', $arg, $matches ) ) {
-        $arg_help = "true";
+        $arg_help = "y";
     }else if ( preg_match( '/^-h=(.*)$/', $arg, $matches ) ) {
         $arg_host = $matches[1];
     }else if ( preg_match( '/^-p=(.*)$/', $arg, $matches ) ) {
@@ -30,12 +30,12 @@ foreach ( $argv as $arg )
         $arg_username = $matches[1];
     }else if ( preg_match( '/^-db=(.*)$/', $arg, $matches ) ) {
         $arg_db = $matches[1];
-    }else if ( preg_match( '/^-file=(.*)$/', $arg, $matches ) ) {
+    }else if ( preg_match( '/^--file=(.*)$/', $arg, $matches ) ) {
         $arg_file = $matches[1];
-    }else if ( preg_match( '/^-dry_run=(.*)$/', $arg, $matches ) ) {
-        $arg_dry_run = $matches[1];
-    }else if ( preg_match( '/^-create_table=(.*)$/', $arg, $matches ) ) {
-        $arg_create_table = $matches[1];
+    }else if ( preg_match( '/^--dry_run$/', $arg, $matches ) ) {
+        $arg_dry_run = "n";
+    }else if ( preg_match( '/^--create_table$/', $arg, $matches ) ) {
+        $arg_create_table = "y";
     }else{
         //unrecognized
     }
@@ -47,7 +47,7 @@ if ( ISSET($arg_help))    {
  action will be taken)\n--dry_run – this will be used with the --file directive in case we want to run the script but not
 insert into the DB. All other functions will be executed, but the database won't be altered\n-u – MySQL username\n-p – MySQL password\n-h – MySQL host\n--help – which will output the above list of directives with details.";
 }
-if ( ($arg_create_table===null) || ($arg_dry_run == 'n' || ($arg_dry_run == 'y') )    {  //db info required
+if ( ($arg_create_table=='y') || (ISSET($arg_dry_run)) || ISSET($arg_file))    {  //db info required
 	if ( $arg_host === null )    { 
 		$arg_host = readline('Host is required : ');
 	}
@@ -62,11 +62,12 @@ if ( ($arg_create_table===null) || ($arg_dry_run == 'n' || ($arg_dry_run == 'y')
 	}
 
 	ftnCreateTable($arg_create_table,$arg_username,$arg_password,$arg_host,$arg_db);
-	if ( ($arg_dry_run == 'y') || ($arg_dry_run == 'n')) { //file required in both cases
+
+	if ($arg_dry_run='n') { //file required
 		if ( $arg_file === null )    { 
 			$arg_file = readline('File is required : ');
 		}		
-		ftnReadFile($arg_file,$arg_file,$arg_create_table,$arg_username,$arg_password,$arg_host,$arg_db);
+		ftnReadFile($arg_file,$arg_dry_run,$arg_create_table,$arg_username,$arg_password,$arg_host,$arg_db);
 	}
 }
 
@@ -87,10 +88,10 @@ if (!$connection) {
 } else{
 	echo "DB server connection good \n";
 }
-$query="DROP TABLE IF EXISTS $ftnDB.$ftnTable";
+$query="DROP TABLE IF EXISTS ".$ftnDB.".users";
 mysqli_query($connection,$query) or die(mysqli_error()); 
 
-$query = "CREATE TABLE  $ftnTable (name varchar(100) NOT NULL,surname varchar(100) NOT NULL,email varchar(100) NOT NULL, UNIQUE KEY email(email))"; 
+$query = "CREATE TABLE users (name varchar(100) NOT NULL,surname varchar(100) NOT NULL,email varchar(100) NOT NULL, UNIQUE KEY email(email))"; 
 
 if (mysqli_query($connection, $query)) { 
   echo "Table successfully created\n"; 
@@ -141,7 +142,7 @@ $row = 1;
 		    }
 		    if ($ValidEmail=='yes'){
 		    	echo "Successful read: ". $data[0] ." ". $data[1] ." ". $data[2] . "\n";
-		    	if ($ftnDry_Run=='n'){ //not inserting data
+		    	if ($ftnDry_Run=='n'){ //inserting data
 		    		ftnInsertRow($data[0],$data[1],$data[2],$ftnTable,$ftnUsername,$ftnPassword,$ftnHost,$ftnDB);
 		    	}
 			}else{
@@ -162,7 +163,7 @@ if (!$connection) {
 $ftnFirstname=mysqli_real_escape_string($connection,$ftnFirstname);
 $ftnLastname=mysqli_real_escape_string($connection,$ftnLastname);
 $ftnEmail=mysqli_real_escape_string($connection,$ftnEmail);
-$query = "INSERT INTO $ftnTable (name, surname, email) VALUES ('$ftnFirstname', '$ftnLastname', '$ftnEmail')";
+$query = "INSERT INTO users (name, surname, email) VALUES ('$ftnFirstname', '$ftnLastname', '$ftnEmail')";
 
 if (mysqli_query($connection, $query)) {
   echo "Successfully insert: $ftnFirstname $ftnLastname $ftnEmail \n";
