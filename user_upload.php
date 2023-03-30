@@ -4,33 +4,78 @@
 //https://www.geeksforgeeks.org/how-to-read-user-or-console-input-in-php/
 //command line prompt user for table name
 
-$Dry_Run = $MySQL_Username = $MySQL_Password = $MySQL_Host = $Create_Table = $Table_Name = $MySQL_DB = '';
-$options = ['file:'];
-$values = getopt(null, $options);
-$UsersFile = $values['file'];
 
-$Create_Table = readline('Create table in database only (y/n) : ');
-$Table_Name = readline('Enter a table name: ');
-$MySQL_Host = readline('Enter a mysql host: ');
-$MySQL_DB = readline('Enter database to use: ');
-$MySQL_Username = readline('Enter a mysql username: ');
-$MySQL_Password = readline('Enter a mysql password: ');
+//https://stackoverflow.com/questions/19159195/after-using-phps-getopt-how-can-i-tell-what-arguments-remain
+$arg_help = null; 
+$arg_host = null; 
+$arg_password = null; 
+$arg_username = null; 
+$arg_db = null; 
+$arg_dry_run = null; 
+$arg_create_table = null; 
+$arg_file = null;  
 
-if ($Create_Table=='y'){ //create table only, no insert or file reading
+//$argv contains an array of all the arguments passed to the script 
+foreach ( $argv as $arg )
+{
+    unset( $matches );
 
-	ftnCreateTable($Table_Name,$MySQL_Username,$MySQL_Password,$MySQL_Host,$MySQL_DB);
+    if ( preg_match( '/^--help$/', $arg, $matches ) ) {
+        $arg_help = "true";
+    }else if ( preg_match( '/^-h=(.*)$/', $arg, $matches ) ) {
+        $arg_host = $matches[1];
+    }else if ( preg_match( '/^-p=(.*)$/', $arg, $matches ) ) {
+        $arg_password = $matches[1];
+    }else if ( preg_match( '/^-u=(.*)$/', $arg, $matches ) ) {
+        $arg_username = $matches[1];
+    }else if ( preg_match( '/^-db=(.*)$/', $arg, $matches ) ) {
+        $arg_db = $matches[1];
+    }else if ( preg_match( '/^-file=(.*)$/', $arg, $matches ) ) {
+        $arg_file = $matches[1];
+    }else if ( preg_match( '/^-dry_run=(.*)$/', $arg, $matches ) ) {
+        $arg_dry_run = $matches[1];
+    }else if ( preg_match( '/^-create_table=(.*)$/', $arg, $matches ) ) {
+        $arg_create_table = $matches[1];
+    }else{
+        //unrecognized
+    }
+}//foreach
 
-}elseif($Create_Table=='n'){//proceed to next question
-
-	$Dry_Run = readline('Is this a dry run (y/n) (create table and read file data, no data insertion): '); 
-
-	ftnCreateTable($Table_Name,$MySQL_Username,$MySQL_Password,$MySQL_Host,$MySQL_DB);
-	ftnReadFile($UsersFile,$Dry_Run,$Table_Name,$MySQL_Username,$MySQL_Password,$MySQL_Host,$MySQL_DB);
-
-}else{
-	echo "Create table answer must be 'y' or 'n' , please try again.\n";	
-	exit();
+if ( ISSET($arg_help))    { 
+	//display help options
+	echo "--file [csv file name] – this is the name of the CSV to be parsed\n--create_table – this will cause the MySQL users table to be built (and no further
+ action will be taken)\n--dry_run – this will be used with the --file directive in case we want to run the script but not
+insert into the DB. All other functions will be executed, but the database won't be altered\n-u – MySQL username\n-p – MySQL password\n-h – MySQL host\n--help – which will output the above list of directives with details.";
 }
+if ( ($arg_create_table===null) || ($arg_dry_run == 'n' || ($arg_dry_run == 'y') )    {  //db info required
+	if ( $arg_host === null )    { 
+		$arg_host = readline('Host is required : ');
+	}
+	if ( $arg_password === null )    { 
+		$arg_password = readline('Password is required : ');
+	}
+	if ( $arg_username === null )    { 
+		$arg_username = readline('Username is required : ');
+	}
+	if ( $arg_db === null )    { 
+		$arg_db = readline('Database is required : ');
+	}
+
+	ftnCreateTable($arg_create_table,$arg_username,$arg_password,$arg_host,$arg_db);
+	if ( ($arg_dry_run == 'y') || ($arg_dry_run == 'n')) { //file required in both cases
+		if ( $arg_file === null )    { 
+			$arg_file = readline('File is required : ');
+		}		
+		ftnReadFile($arg_file,$arg_file,$arg_create_table,$arg_username,$arg_password,$arg_host,$arg_db);
+	}
+}
+
+
+
+
+
+
+
 
 
 ///////////functions///////////
