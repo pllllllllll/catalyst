@@ -28,30 +28,13 @@ if ($Create_Table=='y'){ //create table only, no insert or file reading
 	$MySQL_Username = readline('Enter a mysql username: ');
 	$MySQL_Password = readline('Enter a mysql password: ');	
 	ftnCreateTable($Table_Name,$MySQL_Username,$MySQL_Password,$MySQL_Host,$MySQL_DB);
-	ftnReadFile($UsersFile);
+	ftnReadFile($UsersFile,$Dry_Run,$Table_Name,$MySQL_Username,$MySQL_Password,$MySQL_Host,$MySQL_DB);
 
-	//if ($Dry_Run=='n'){ //proceed with create/read/insert
-
-	//}elseif($Dry_Run=='y'){//no db insert, create table and read data
-		//$Table_Name = readline('Enter a table name: ');
-	//}else{
-		//echo "Answer must be 'y' or 'n' , please try again.\n";	
-		//exit();
-	//}
 }else{
 	echo "Answer must be 'y' or 'n' , please try again.\n";	
 	exit();
 }
 
-
-
-
-//create table in all cases
-if (ISSET($ftnTableName)){//create table
-	//ftnCreateTable($ftnTableName,$ftnUsername,$ftnPassword);
-}else{
-	exit(); 
-}
 
 /////////////////////////////////
 function ftnCreateTable($ftnTable,$ftnUsername,$ftnPassword,$ftnHost,$ftnDB){
@@ -78,9 +61,9 @@ mysqli_close($connection);
 }//function ftnCreateTable
 
 //dry run, read data
-function ftnReadFile($strUsersFile){
+function ftnReadFile($ftnUsersFile,$ftnDry_Run,$ftnTable,$ftnUsername,$ftnPassword,$ftnHost,$ftnDB){
 $row = 1;
-	if (($handle = fopen($strUsersFile, "r")) !== FALSE) {
+	if (($handle = fopen($ftnUsersFile, "r")) !== FALSE) {
 		fgetcsv($handle, 10000, ","); //reads first line header, so its skipped in the while loop
 	  while (($data = fgetcsv($handle, 200, ",")) !== FALSE) {
 	    $num = count($data);
@@ -116,8 +99,11 @@ $row = 1;
 		    }
 		    if ($ValidEmail=='yes'){
 		    	echo "Successful read: ". $data[0] ." ". $data[1] ." ". $data[2] . "\n";
+		    	if ($ftnDry_Run=='n'){ //not inserting data
+		    		ftnInsertRow($data[0],$data[1],$data[2],$ftnTable,$ftnUsername,$ftnPassword,$ftnHost,$ftnDB);
+		    	}
 			}else{
-				echo "Invalid Email: ". $data[0] ." ". $data[1] ." ". $data[2] . "\n";
+				echo "Invalid Email, Not Inserting: ". $data[0] ." ". $data[1] ." ". $data[2] . "\n";
 			}
 		}
 	  }
@@ -125,7 +111,25 @@ $row = 1;
 	}
 }//ftnReadFile($strUsersFile){
 
+function ftnInsertRow($ftnFirstname,$ftnLastname,$ftnEmail,$ftnTable,$ftnUsername,$ftnPassword,$ftnHost,$ftnDB){
+$connection = mysqli_connect($ftnHost, $ftnUsername, $ftnPassword, $ftnDB); 
+if (!$connection) { 
+  die("Failed ". mysqli_connect_error()); 
+} 
 
+$ftnFirstname=mysqli_real_escape_string($connection,$ftnFirstname);
+$ftnLastname=mysqli_real_escape_string($connection,$ftnLastname);
+$ftnEmail=mysqli_real_escape_string($connection,$ftnEmail);
+$query = "INSERT INTO $ftnTable (name, surname, email) VALUES ('$ftnFirstname', '$ftnLastname', '$ftnEmail')";
+
+if (mysqli_query($connection, $query)) {
+  echo "Successfully insert: $ftnFirstname $ftnLastname $ftnEmail \n";
+} else {
+  echo "Error: " . $query . "\n" . mysqli_error($connection);
+}
+//close the connection 
+mysqli_close($connection); 
+}//function ftnInsertRow()
 
 
 
@@ -143,7 +147,7 @@ $row = 1;
 
 
 
-function ftnInsertData($ftnUsersFile,$ftnTableName,$ftnUsername,$ftnPassword){
+function xftnInsertData($ftnUsersFile,$ftnTableName,$ftnUsername,$ftnPassword){
 
 	//$lines = file($values['file'], FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES);
 	// Rest of the script...
