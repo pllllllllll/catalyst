@@ -1,5 +1,6 @@
 <?php
-//C:\xampp\php\php.exe C:\xampp\htdocs\catalyst\catalyst\logictest.php  
+//cmd line:
+//C:\xampp\php\php.exe C:\xampp\htdocs\catalyst\catalyst\foobar.php  
 for ($c=1; $c < 101; $c++) {
 
   $three = $c/3;
@@ -19,7 +20,6 @@ for ($c=1; $c < 101; $c++) {
   if (is_float($three) && is_float($five)) {
     echo "$c ";
   }
-
 
   echo "\n";
 
