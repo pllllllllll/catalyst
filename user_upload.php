@@ -168,7 +168,7 @@ $query = "INSERT INTO users (name, surname, email) VALUES ('$ftnFirstname', '$ft
 if (mysqli_query($connection, $query)) {
   echo "Successfully insert: $ftnFirstname $ftnLastname $ftnEmail \n";
 } else {
-  echo "Error: " . $query . "\n" . mysqli_error($connection);
+  echo "Error: " . $query . "\n" . mysqli_error($connection). "\n";
 }
 //close the connection 
 mysqli_close($connection); 
