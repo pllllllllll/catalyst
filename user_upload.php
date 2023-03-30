@@ -22,15 +22,15 @@ foreach ( $argv as $arg )
 
     if ( preg_match( '/^--help$/', $arg, $matches ) ) {
         $arg_help = "y";
-    }else if ( preg_match( '/^-h (.*)$/', $arg, $matches ) ) {
+    }else if ( preg_match( '/^-h=(.*)$/', $arg, $matches ) ) {
         $arg_host = $matches[1];
-    }else if ( preg_match( '/^-p (.*)$/', $arg, $matches ) ) {
+    }else if ( preg_match( '/^-p=(.*)$/', $arg, $matches ) ) {
         $arg_password = $matches[1];
-    }else if ( preg_match( '/^-u (.*)$/', $arg, $matches ) ) {
+    }else if ( preg_match( '/^-u=(.*)$/', $arg, $matches ) ) {
         $arg_username = $matches[1];
-    }else if ( preg_match( '/^-db (.*)$/', $arg, $matches ) ) {
+    }else if ( preg_match( '/^-db=(.*)$/', $arg, $matches ) ) {
         $arg_db = $matches[1];
-    }else if ( preg_match( '/^--file (.*)$/', $arg, $matches ) ) {
+    }else if ( preg_match( '/^--file=(.*)$/', $arg, $matches ) ) {
         $arg_file = $matches[1];
     }else if ( preg_match( '/^--dry_run$/', $arg, $matches ) ) {
         $arg_dry_run = "n";
@@ -45,7 +45,7 @@ if ( ISSET($arg_help))    {
 	//display help options
 	echo "--file [csv file name] – this is the name of the CSV to be parsed\n--create_table – this will cause the MySQL users table to be built (and no further
  action will be taken)\n--dry_run – this will be used with the --file directive in case we want to run the script but not
-insert into the DB. All other functions will be executed, but the database won't be altered\n-u – MySQL username\n-p – MySQL password\n-h – MySQL host\n--help – which will output the above list of directives with details.";
+insert into the DB. All other functions will be executed, but the database won't be altered\n-u – MySQL username\n-p – MySQL password\n-h – MySQL host\n-db - MySQL database\n--help – which will output the above list of directives with details.";
 }
 if ( ($arg_create_table=='y') || (ISSET($arg_dry_run)) || ISSET($arg_file))    {  //db info required
 	if ( $arg_host === null )    { 
