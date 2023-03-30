@@ -4,23 +4,27 @@
 //https://www.geeksforgeeks.org/how-to-read-user-or-console-input-in-php/
 //command line prompt user for table name
 
-$Dry_Run = $MySQL_Username = $MySQL_Password = $Create_Table = $Table_Name = '';
+$Dry_Run = $MySQL_Username = $MySQL_Password = $MySQL_Host = $Create_Table = $Table_Name = $MySQL_DB = '';
 
 $Create_Table = readline('Create table in database only (y/n) : ');
 
 if ($Create_Table=='y'){ //create table only, no insert or file reading
 	$Table_Name = readline('Enter a table name: ');
+		$MySQL_Host = readline('Enter a mysql host: ');
+		$MySQL_DB = readline('Enter database to use: ');
 	$MySQL_Username = readline('Enter a mysql username: ');
 	$MySQL_Password = readline('Enter a mysql password: ');
-	ftnCreateTable($ftnTableName,$ftnUsername,$ftnPassword){
+	ftnCreateTable($Table_Name,$MySQL_Username,$MySQL_Password,$MySQL_Host,$MySQL_DB);
 }elseif($Create_Table=='n'){//proceed to next question
 
 	$Dry_Run = readline('Is this a dry run (y/n) : '); //create table and read file data
-	
+	$Table_Name = readline('Enter a table name: ');
+		$MySQL_Host = readline('Enter a mysql host: ');
+		$MySQL_DB = readline('Enter database to use: ');
+	$MySQL_Username = readline('Enter a mysql username: ');
+	$MySQL_Password = readline('Enter a mysql password: ');	
 	if ($Dry_Run=='n'){ //proceed with create/read/insert
-		$Table_Name = readline('Enter a table name: ');
-		$MySQL_Username = readline('Enter a mysql username: ');
-		$MySQL_Password = readline('Enter a mysql password: ');
+
 	}elseif($Dry_Run=='y'){//no db insert, create table and read data
 		$Table_Name = readline('Enter a table name: ');
 	}else{
@@ -45,7 +49,30 @@ if (ISSET($ftnTableName)){//create table
 }
 
 /////////////////////////////////
-function ftnCreateTable($ftnTableName,$ftnUsername,$ftnPassword){
+function ftnCreateTable($ftnTable,$ftnUsername,$ftnPassword,$ftnHost,$ftnDB){
+$connection = mysqli_connect($ftnHost, $ftnUsername, $ftnPassword, $ftnDB); 
+if (!$connection) { 
+  die("Failed ". mysqli_connect_error()); 
+} else{
+	echo "DB server connection good \n";
+}
+$query="DROP TABLE IF EXISTS $ftnDB.$ftnTable";
+mysqli_query($connection,$query) or die(mysqli_error()); 
+
+$query = "CREATE TABLE  users (name varchar(100) NOT NULL,surname varchar(100) NOT NULL,email varchar(100) NOT NULL, UNIQUE KEY email(email))"; 
+//CREATE TABLE `test`.`paultest` ( `name` VARCHAR NOT NULL , `lastname` VARCHAR NOT NULL , `email` VARCHAR NOT NULL , UNIQUE `email` (`email`))
+
+
+if (mysqli_query($connection, $query)) { 
+  echo "Table is successfully created\n"; 
+} else { 
+  echo "Error:" . mysqli_error($connection); 
+} 
+
+  
+
+//close the connection 
+mysqli_close($connection); 
 
 }//function ftnCreateTable
 
